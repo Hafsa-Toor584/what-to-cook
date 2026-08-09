@@ -61,17 +61,65 @@ function printAtlasHelp() {
   console.error('------------------------------------------\n');
 }
 
+function describeMongoUri(uri) {
+  if (!uri) return { set: false };
+  const trimmed = uri.trim();
+  const info = {
+    set: true,
+    length: trimmed.length,
+    hasSurroundingQuotes: /^["']/.test(trimmed) || /["']$/.test(trimmed),
+    hasWhitespace: /\s/.test(trimmed),
+    scheme: trimmed.startsWith('mongodb+srv://')
+      ? 'mongodb+srv'
+      : trimmed.startsWith('mongodb://')
+        ? 'mongodb'
+        : 'other',
+  };
+  try {
+    const normalized = trimmed
+      .replace(/^mongodb\+srv:\/\//, 'https://')
+      .replace(/^mongodb:\/\//, 'https://');
+    const parsed = new URL(normalized);
+    info.user = decodeURIComponent(parsed.username || '');
+    info.host = parsed.hostname;
+    info.passLength = (parsed.password || '').length;
+    info.hasDbName = Boolean(parsed.pathname && parsed.pathname !== '/');
+  } catch {
+    info.parseOk = false;
+  }
+  return info;
+}
+
 async function start() {
+  // #region agent log
+  fetch('http://127.0.0.1:7344/ingest/4721d593-5167-4872-9806-12e34c51eade',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d84713'},body:JSON.stringify({sessionId:'d84713',runId:'render-mongo',hypothesisId:'A',location:'server/index.js:start',message:'Mongo connect attempt (no secrets)',data:describeMongoUri(process.env.MONGODB_URI),timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
       serverSelectionTimeoutMS: 10000,
     });
     console.log('Connected to MongoDB');
+    // #region agent log
+    fetch('http://127.0.0.1:7344/ingest/4721d593-5167-4872-9806-12e34c51eade',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d84713'},body:JSON.stringify({sessionId:'d84713',runId:'render-mongo',hypothesisId:'A',location:'server/index.js:start',message:'Mongo connect ok',data:{},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error.message);
+    const uriInfo = describeMongoUri(process.env.MONGODB_URI);
+    console.error('Mongo URI check (no password):', JSON.stringify(uriInfo));
+    // #region agent log
+    fetch('http://127.0.0.1:7344/ingest/4721d593-5167-4872-9806-12e34c51eade',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d84713'},body:JSON.stringify({sessionId:'d84713',runId:'render-mongo',hypothesisId:'A',location:'server/index.js:start',message:'Mongo connect failed',data:{err:error.message,uriInfo},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+    if (
+      error.message.includes('bad auth') ||
+      error.message.includes('Authentication failed')
+    ) {
+      console.error(
+        'Fix: Render Environment → MONGODB_URI must match Atlas DB user password exactly (copy from local server/.env). No quotes. Reset password in Atlas → Database Access if unsure.'
+      );
+    }
     if (error.message.includes('whitelist') || error.message.includes('IP')) {
       printAtlasHelp();
     }
