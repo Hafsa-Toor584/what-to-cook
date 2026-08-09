@@ -21,6 +21,17 @@ applySecurity(app);
 app.use(express.json({ limit: '100kb' }));
 app.use('/api', apiLimiter);
 
+app.get('/', (_req, res) => {
+  // #region agent log
+  fetch('http://127.0.0.1:7344/ingest/4721d593-5167-4872-9806-12e34c51eade',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d84713'},body:JSON.stringify({sessionId:'d84713',runId:'root-route',hypothesisId:'A',location:'server/index.js:/',message:'Root route hit',data:{},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+  res.json({
+    name: 'What to Cook API',
+    status: 'ok',
+    health: '/api/health',
+  });
+});
+
 app.get('/api/health', (_req, res) => {
   const season = getCurrentSeason();
   res.json({
