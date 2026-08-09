@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node --watch index.js",
     "start": "node index.js",
+    "build": "node -e \"console.log('API: no compile step')\"",
     "seed": "node seed/seed.js"
   },
   "dependencies": {
