@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-top: #e7f1ea;
+  --bg-mid: #f3efe6;
+  --bg-bottom: #faf6ef;
+  --ink: #1e3a2a;
+  --accent: #e8921a;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: Outfit, system-ui, sans-serif;
+  background:
+    radial-gradient(ellipse 90% 55% at 0% -5%, rgba(74, 135, 96, 0.22), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 100% 5%, rgba(232, 146, 26, 0.16), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(151, 192, 162, 0.12), transparent 40%),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 45%, var(--bg-bottom) 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.rtl {
+  font-family: 'Noto Nastaliq Urdu', serif;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex min-h-touch min-w-touch items-center justify-center gap-2 rounded-2xl bg-leaf-800 px-5 py-3.5 text-base font-bold text-white shadow-soft transition hover:bg-leaf-900 active:scale-[0.98] disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex min-h-touch min-w-touch items-center justify-center gap-2 rounded-2xl border-2 border-leaf-800/15 bg-white/80 px-5 py-3.5 text-base font-bold text-leaf-900 shadow-soft transition hover:border-leaf-700 hover:bg-white active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply inline-flex min-h-touch items-center justify-center gap-2 rounded-2xl px-4 py-2 text-base font-semibold text-leaf-800 transition hover:bg-leaf-100/80;
+  }
+
+  .btn-accent {
+    @apply inline-flex min-h-touch min-w-touch items-center justify-center gap-2 rounded-2xl bg-spice-500 px-5 py-3.5 text-base font-bold text-white shadow-soft transition hover:bg-spice-600 active:scale-[0.98] disabled:opacity-50;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border-2 border-leaf-200/80 bg-white/90 px-4 py-3.5 text-lg outline-none transition placeholder:text-leaf-400 focus:border-leaf-500 focus:bg-white;
+  }
+
+  .surface {
+    @apply rounded-[1.75rem] bg-white/80 shadow-soft backdrop-blur-md;
+  }
+
+  .chip {
+    @apply inline-flex min-h-touch min-w-0 max-w-full items-center justify-center gap-2 rounded-2xl border-2 border-leaf-200/90 bg-white/90 px-3 py-2 text-sm font-bold leading-snug text-leaf-800 transition whitespace-normal break-words text-center hover:border-leaf-400;
+  }
+
+  .chip-active {
+    @apply border-leaf-800 bg-leaf-800 text-white hover:border-leaf-800;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes soft-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e0ede3 25%, #f2f7f3 50%, #e0ede3 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out both;
+}
+
+.animate-pop {
+  animation: pop 0.4s ease-out both;
+}
+
+.animate-soft-float {
+  animation: soft-float 3.5s ease-in-out infinite;
+}
+
+.animate-hero-zoom {
+  animation: hero-zoom 1.1s ease-out both;
+}
