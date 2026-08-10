@@ -122,22 +122,39 @@ If API hangs forever: Render may be waking up — wait and retry.
 ## 6. Password reset emails (optional)
 
 Password reset works without email, but the link is only printed in the server logs.
-To email the link to users, set SMTP env vars on Render.
 
-Gmail example (needs 2-step verification on the Google account):
+> **Gmail SMTP does not work on Render's free tier.** Free services cannot send
+> outbound traffic on ports 25, 465, or 587, so the connection hangs and times out.
+> Use an HTTP email API instead (below), or upgrade to a paid Render instance.
 
-1. Google Account → Security → **App passwords** → create one for "Mail".
-2. On Render → Environment:
+### Brevo (recommended: free tier, no domain needed)
+
+1. Sign up at [brevo.com](https://www.brevo.com) with the address you want mail to come from.
+2. Verify that address (Senders → add and confirm the emailed link).
+3. Create an API key: **SMTP & API → API keys → Generate**.
+4. On Render → Environment:
+
+| Key | Value |
+|-----|--------|
+| `BREVO_API_KEY` | your API key |
+| `MAIL_FROM` | `What to Cook <your-verified@email.com>` |
+
+5. Save. Render redeploys automatically.
+
+`RESEND_API_KEY` works the same way if you prefer [Resend](https://resend.com),
+though sending to addresses other than your own requires a verified domain there.
+
+### SMTP (local development, or paid Render instances)
 
 | Key | Value |
 |-----|--------|
 | `SMTP_HOST` | `smtp.gmail.com` |
 | `SMTP_PORT` | `587` |
 | `SMTP_USER` | your Gmail address |
-| `SMTP_PASS` | the 16-character app password |
+| `SMTP_PASS` | 16-character Gmail app password |
 | `MAIL_FROM` | `What to Cook <your@gmail.com>` |
 
-3. Save and redeploy.
+An HTTP API key takes priority over SMTP when both are set.
 
 Reset links point at `CLIENT_URL`, so that must be your Vercel URL.
 Links expire after 1 hour and can only be used once.

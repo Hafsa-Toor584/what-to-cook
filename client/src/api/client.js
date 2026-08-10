@@ -5,7 +5,8 @@ const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 const api = axios.create({
   baseURL: apiBase ? `${apiBase}/api` : '/api',
   headers: { 'Content-Type': 'application/json' },
-  timeout: 20000,
+  // Long enough to survive a free-tier API cold start
+  timeout: 45000,
 });
 
 api.interceptors.request.use((config) => {

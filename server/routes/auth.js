@@ -6,7 +6,7 @@ import User from '../models/User.js';
 import UserPreference from '../models/UserPreference.js';
 import { authMiddleware, attachUser } from '../middleware/auth.js';
 import { authLimiter } from '../middleware/security.js';
-import { isMailConfigured, sendMail } from '../services/mailer.js';
+import { isMailConfigured, mailProvider, sendMail } from '../services/mailer.js';
 
 const router = express.Router();
 
@@ -153,7 +153,7 @@ router.post('/forgot-password', authLimiter, async (req, res, next) => {
     try {
       await sendMail({ to: user.email, subject, text });
     } catch (mailError) {
-      console.error('Reset email failed:', mailError.message);
+      console.error(`Reset email failed via ${mailProvider()}:`, mailError.message);
       return res.status(502).json({ message: 'Could not send the reset email. Try again later.' });
     }
 
