@@ -61,6 +61,13 @@ export function AuthProvider({ children }) {
     return data.user;
   };
 
+  const setSession = (token, nextUser) => {
+    localStorage.setItem('wtc_token', token);
+    setUser(nextUser);
+    syncLanguage(nextUser?.preferredLanguage || 'en');
+    return nextUser;
+  };
+
   const logout = () => {
     localStorage.removeItem('wtc_token');
     setUser(null);
@@ -76,7 +83,7 @@ export function AuthProvider({ children }) {
   };
 
   const value = useMemo(
-    () => ({ user, loading, login, register, logout, updateUser, refresh: loadMe }),
+    () => ({ user, loading, login, register, logout, updateUser, setSession, refresh: loadMe }),
     [user, loading, loadMe]
   );
 

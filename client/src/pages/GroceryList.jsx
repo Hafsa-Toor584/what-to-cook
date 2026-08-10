@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Check, Copy, MessageCircle, Share2 } from 'lucide-react';
 import api from '../api/client';
 import { ingredientName } from '../utils/names';
 
@@ -13,6 +13,7 @@ export default function GroceryList() {
   const [data, setData] = useState(null);
   const [checked, setChecked] = useState({});
   const [loading, setLoading] = useState(true);
+  const [shareNote, setShareNote] = useState('');
 
   useEffect(() => {
     let alive = true;
@@ -33,6 +34,48 @@ export default function GroceryList() {
     };
   }, [id]);
 
+  useEffect(() => {
+    if (!shareNote) return undefined;
+    const timer = setTimeout(() => setShareNote(''), 2500);
+    return () => clearTimeout(timer);
+  }, [shareNote]);
+
+  const shareText = useMemo(() => {
+    if (!data) return '';
+    const lines = [`${t('groceryList')} — ${t('appName')}`];
+    if (data.guestCount) lines.push(t('forPeople', { count: data.guestCount }));
+    lines.push('');
+    for (const item of data.items || []) {
+      lines.push(`• ${ingredientName(item, lang)} — ${item.quantity} ${item.unit}`);
+    }
+    return lines.join('\n');
+  }, [data, lang, t]);
+
+  const copyList = async () => {
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setShareNote(t('copied'));
+    } catch {
+      setShareNote(t('copyFailed'));
+    }
+  };
+
+  const shareList = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: t('groceryList'), text: shareText });
+        return;
+      } catch {
+        // Share sheet dismissed or unavailable; fall back to clipboard
+      }
+    }
+    copyList();
+  };
+
+  const shareOnWhatsApp = () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank', 'noopener');
+  };
+
   if (loading) return <p className="font-semibold text-leaf-700">{t('loading')}</p>;
   if (!data) return <p className="font-semibold text-red-700">{t('error')}</p>;
 
@@ -50,6 +93,31 @@ export default function GroceryList() {
           </p>
         </div>
       </header>
+
+      {(data.items || []).length > 0 && (
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            <button type="button" className="btn-primary" onClick={shareList}>
+              <Share2 className="h-5 w-5" />
+              {t('share')}
+            </button>
+            <button type="button" className="btn-secondary" onClick={shareOnWhatsApp}>
+              <MessageCircle className="h-5 w-5" />
+              {t('whatsapp')}
+            </button>
+            <button type="button" className="btn-secondary" onClick={copyList}>
+              <Copy className="h-5 w-5" />
+              {t('copy')}
+            </button>
+          </div>
+          {shareNote && (
+            <p className="flex items-center gap-2 font-bold text-leaf-700">
+              <Check className="h-4 w-4" />
+              {shareNote}
+            </p>
+          )}
+        </div>
+      )}
 
       <ul className="space-y-2">
         {(data.items || []).map((item, i) => {

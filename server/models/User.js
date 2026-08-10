@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema(
     passwordHash: { type: String, required: true },
     preferredLanguage: { type: String, enum: ['en', 'ur'], default: 'en' },
     preferredRegion: { type: mongoose.Schema.Types.ObjectId, ref: 'Region', default: null },
+    resetTokenHash: { type: String, default: null, select: false },
+    resetTokenExpiresAt: { type: Date, default: null, select: false },
   },
   { timestamps: true }
 );

@@ -63,6 +63,7 @@ Without this, production API cannot reach MongoDB.
 | `JWT_SECRET` | strong secret |
 | `CLIENT_URL` | `https://YOUR-APP.vercel.app` (update after step 3) |
 | `OPENAI_API_KEY` | optional |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` / `MAIL_FROM` | optional, enables password reset emails |
 
 4. Deploy and open `https://YOUR-API.onrender.com/api/health`  
    You should see `{ "status": "ok", ... }`.
@@ -118,7 +119,32 @@ If API hangs forever: Render may be waking up — wait and retry.
 
 ---
 
-## 6. Custom domain (optional)
+## 6. Password reset emails (optional)
+
+Password reset works without email, but the link is only printed in the server logs.
+To email the link to users, set SMTP env vars on Render.
+
+Gmail example (needs 2-step verification on the Google account):
+
+1. Google Account → Security → **App passwords** → create one for "Mail".
+2. On Render → Environment:
+
+| Key | Value |
+|-----|--------|
+| `SMTP_HOST` | `smtp.gmail.com` |
+| `SMTP_PORT` | `587` |
+| `SMTP_USER` | your Gmail address |
+| `SMTP_PASS` | the 16-character app password |
+| `MAIL_FROM` | `What to Cook <your@gmail.com>` |
+
+3. Save and redeploy.
+
+Reset links point at `CLIENT_URL`, so that must be your Vercel URL.
+Links expire after 1 hour and can only be used once.
+
+---
+
+## 7. Custom domain (optional)
 
 1. Buy a domain (Namecheap, Cloudflare, etc.).
 2. In Vercel → Project → Domains → add `app.yourdomain.com`.

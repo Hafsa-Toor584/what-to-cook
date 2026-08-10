@@ -86,6 +86,11 @@ export default function Login() {
             {busy ? t('loading') : t('login')}
           </button>
         </form>
+        <p className="text-center">
+          <Link className="font-bold text-leaf-700 underline" to="/forgot-password">
+            {t('forgotPassword')}
+          </Link>
+        </p>
         <p className="text-center font-semibold text-leaf-700">
           {t('noAccount')}{' '}
           <Link className="font-bold text-spice-600 underline" to="/register">

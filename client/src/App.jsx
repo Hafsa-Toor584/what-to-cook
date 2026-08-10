@@ -2,10 +2,12 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Browse from './pages/Browse';
+import ForgotPassword from './pages/ForgotPassword';
 import GroceryList from './pages/GroceryList';
 import GuestPlan from './pages/GuestPlan';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import ResetPassword from './pages/ResetPassword';
 import PlanBuilder from './pages/PlanBuilder';
 import Plans from './pages/Plans';
 import Profile from './pages/Profile';
@@ -18,6 +20,8 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
